@@ -38,7 +38,7 @@ logger = setup_logger(__name__)
 
 
 class MAClsTrainer(object):
-    def __init__(self, configs, use_gpu=True):
+    def __init__(self, configs, use_gpu=False):
         """ macls集成工具类
 
         :param configs: 配置字典
@@ -536,6 +536,7 @@ class MAClsTrainer(object):
         accuracies, losses, preds, labels = [], [], [], []
         with torch.no_grad():
             for batch_id, (features, label, input_lens) in enumerate(tqdm(self.test_loader)):
+                print("label=",label)
                 if self.stop_eval: break
                 features = features.to(self.device)
                 label = label.to(self.device).long()
@@ -557,7 +558,12 @@ class MAClsTrainer(object):
         # 保存混合矩阵
         if save_matrix_path is not None:
             try:
+                print("labels=",labels)
+                print("preds=",preds)
+
                 cm = confusion_matrix(labels, preds)
+                print("cmmm===\n",cm)
+                print("self.class_labels==",self.class_labels)
                 plot_confusion_matrix(cm=cm, save_path=os.path.join(save_matrix_path, f'{int(time.time())}.png'),
                                       class_labels=self.class_labels)
             except Exception as e:

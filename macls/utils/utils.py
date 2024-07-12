@@ -74,24 +74,30 @@ def plot_confusion_matrix(cm, save_path, class_labels, show=False):
     plt.figure(figsize=(12, 8), dpi=100)
     np.set_printoptions(precision=2)
     # 在混淆矩阵中绘制每个格子的概率值
-    ind_array = np.arange(len(class_labels))
+    #ind_array = np.arange(len(class_labels))
+    ind_array = np.arange(len(class_labels)-2)
+    print("len(class_labels)=",len(class_labels))
     x, y = np.meshgrid(ind_array, ind_array)
+    print("before for")
     for x_val, y_val in zip(x.flatten(), y.flatten()):
+        logger.info("x_val: %d, y_val: %d" % (x_val, y_val))
         c = cm[y_val][x_val] / (np.sum(cm[:, x_val]) + 1e-6)
         # 忽略概率值太小的格子
         if c < 1e-4: continue
         plt.text(x_val, y_val, "%0.2f" % (c,), color='red', fontsize=15, va='center', ha='center')
+    print("after for")
     m = np.sum(cm, axis=0) + 1e-6
     plt.imshow(cm / m, interpolation='nearest', cmap=plt.cm.binary)
     plt.title('Confusion Matrix' if is_ascii else '混合矩阵')
     plt.colorbar()
     # 设置类别标签
+    print("set  labels")
     xlocations = np.array(range(len(class_labels)))
     plt.xticks(xlocations, class_labels, rotation=90)
     plt.yticks(xlocations, class_labels)
     plt.ylabel('Actual label' if is_ascii else '实际标签')
     plt.xlabel('Predict label' if is_ascii else '预测标签')
-
+    print("adjust scale")
     # 调整刻度标记位置，提高可视化效果
     tick_marks = np.array(range(len(class_labels))) + 0.5
     plt.gca().set_xticks(tick_marks, minor=True)
@@ -100,6 +106,7 @@ def plot_confusion_matrix(cm, save_path, class_labels, show=False):
     plt.gca().yaxis.set_ticks_position('none')
     plt.grid(True, which='minor', linestyle='-')
     plt.gcf().subplots_adjust(bottom=0.15)
+    print("save images")
     # 保存图片
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     plt.savefig(save_path, format='png')
